@@ -1,12 +1,23 @@
 import React, { Component } from 'react'
 
-export default class search extends Component {
+export default class Search extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    
+
     render() {
         return (
             <div>
-                <form className="search search--searchbar">
-                    <input type="text" id="searchbar-input" className="search--input" />
-                    <button className="searchbar--submit" onClick={this.locationSearchHandler}><i className="fa fa-chevron-right"></i></button>
+                <form onSubmit={this.props.searchHandler} className="search search--searchbar">
+                    <input 
+                    type="text" 
+                    id="searchbar-input" 
+                    name="locationInput"
+                    placeholder="Search a location..." 
+                    className="search--input" />
+                    <input className="searchbar--submit" type="submit" value="Submit" />
                 </form>
             </div>
         )
