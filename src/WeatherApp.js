@@ -25,7 +25,6 @@ const WeatherApp = () => {
       },
     })
     .catch(error => {
-      console.log("Most likely not a valid location entered!");
       throw Error;
     })
     .then(response => response.json())
