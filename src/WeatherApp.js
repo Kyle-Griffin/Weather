@@ -1,68 +1,67 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { unstable_batchedUpdates } from 'react-dom';
+
 import Search from './components/search';
+import WeatherWrapper from './components/weatherWrapper';
+
 import './App.css';
 
-class WeatherApp extends React.Component {
-  state = {
-    appID: '147c266bddb96d9caf03b62e816f51a3',
-    currentLocation: [{
-      location: 'test',
-      temperature: '',
-      status: '',
-    }]
-  };
+const WeatherApp = () => {
+
+  // We would obfuscate this ID in production.
+  const appID = '147c266bddb96d9caf03b62e816f51a3';
+
+  const [weather, setWeather] = useState([]);
+
+  const getWeatherData = async(url) => {
+    const fullUrl = url + `&appid=${appID}`;
+    console.log(fullUrl);
+    const apiData = await fetch(fullUrl, {
+      method: "POST",
+      mode: "cors",
+      cache: "no-cache",
+      headers: {
+        'Content-type': 'application/json'
+      },
+    })
+    .catch(error => {
+      console.log("Most likely not a valid location entered!");
+      throw Error;
+    })
+    .then(response => response.json())
+    .then(data => data)
+        setWeather({
+          data: apiData,
+        });
+    }
   
 
-  searchHandler = (event) => {
+  const searchHandler = (event) => {
     event.preventDefault();
     var locationChoice = event.target.locationInput.value;
     // https://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=YOUR_API_KEY
     if (locationChoice.length > 0) { 
       try {
-        const weatherData = getWeatherData('https://api.openweathermap.org/data/2.5/weather?q=', { location: locationChoice});
-        console.log(JSON.stringify(weatherData)); // JSON-string from `response.json()` call
-        this.setState({
-          currentLocation: [{
-            location: weatherData
-          }]
-        }); 
+        getWeatherData(`https://cors-anywhere.herokuapp.com/https://api.openweathermap.org/data/2.5/weather?q=${locationChoice}`);
       } catch (error) {
         console.error(error);
       }
     } else {
-      this.setState({
-        currentLocation: [{
-          location: "Please select a city" 
-        }]
-      });
-    }
-
-    async function getWeatherData(url = '', location = {}) {
-      const fullUrl = url + location.location + '&appid=147c266bddb96d9caf03b62e816f51a3';
-      const response = await fetch(fullUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        body: JSON.stringify(location)
-      });
-      return await response.json();
+          alert("Please enter a city");
     }
   }
 
   
 
-  render() {
+  
+
     return (
       <div className="WeatherApp">
-        <div className="weather-display">
-          <p>{this.state.currentLocation[0].location}</p>
-        </div>
-        <Search searchHandler={this.searchHandler.bind(this)} />
+        <WeatherWrapper weather={weather.data} />
+        {console.log(weather.data)}
+        <Search searchHandler={searchHandler.bind(this)} />
       </div>
     );
-  }
 }
 
 export default WeatherApp;
